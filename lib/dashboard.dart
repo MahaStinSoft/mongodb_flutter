@@ -1,14 +1,46 @@
 import 'package:dd_app/login.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Dashboard extends StatelessWidget {
-  final Map<String, dynamic>? user;
-  Dashboard({this.user});
+class Dashboard extends StatefulWidget {
+  @override
+  _DashboardState createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  String? email;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserDetails();
+  }
+
+  Future<void> _loadUserDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      email = prefs.getString('userEmail');
+    });
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('isLoggedIn');
+    await prefs.remove('userEmail'); // Remove user details
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
+        elevation: 0,
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -21,7 +53,7 @@ class Dashboard extends StatelessWidget {
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
+                MaterialPageRoute(builder: (context) => LoginScreen()),
                 (Route<dynamic> route) => false, // Clear all previous routes
               );
             },
@@ -55,121 +87,16 @@ class Dashboard extends StatelessWidget {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // No active loans section
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Center(
-                    child: Icon(
-                      Icons.money_off,
-                      size: 40,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Center(
-                    child: Text(
-                      'No active loans',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            // "You haven't taken loans yet" section
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Center(
-                child: Text(
-                  "You haven't taken loans yet. Check loan offers to get started.",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // View Offers Button
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle view offers action
-                },
-                child: const Text('View Offers'),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Exclusive Offer section
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.red[50],
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.local_offer, color: Colors.red[800]),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Exclusive Offer',
-                        style: TextStyle(fontSize: 18, color: Colors.red),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Personal loan',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    '\$15000000',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'Loan disburses in 24 hours. Apply Now',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Apply Now Button
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle apply now action
-                },
-                child: const Text('Apply Now'),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                ),
-              ),
-            ),
+            email != null
+                ? Text('Welcome, $email!')
+                : Text('Loading user details...'),
+            SizedBox(height: 20),
+            Text('This is your dashboard.'),
+            // Add more widgets as needed
           ],
         ),
       ),
