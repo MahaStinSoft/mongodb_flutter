@@ -50,13 +50,7 @@ class _DashboardState extends State<Dashboard> {
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-                (Route<dynamic> route) => false, // Clear all previous routes
-              );
-            },
+            onPressed: _logout,
           ),
         ],
       ),
