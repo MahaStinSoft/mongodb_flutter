@@ -1,30 +1,31 @@
-import 'package:dd_app/login.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'login.dart';
 import 'dashboard.dart';
+import 'api_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+  final AuthService authService = AuthService();
+  final email = await authService.getLoggedInEmail();
+  runApp(MyApp(startingEmail: email));
 }
 
 class MyApp extends StatelessWidget {
-  final bool isLoggedIn;
+  final String? startingEmail;
 
-  MyApp({required this.isLoggedIn});
+  MyApp({this.startingEmail});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Auth Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: isLoggedIn ? Dashboard() : LoginScreen(),
+      home: startingEmail != null
+          ? Dashboard(email: startingEmail!)
+          : LoginPage(),
     );
   }
 }

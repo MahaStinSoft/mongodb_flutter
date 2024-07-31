@@ -1,36 +1,24 @@
-import 'package:dd_app/login.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'api_service.dart';
+import 'login.dart';
 
 class Dashboard extends StatefulWidget {
+  final String email;
+
+  Dashboard({required this.email});
+
   @override
   _DashboardState createState() => _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
-  String? email;
+  final AuthService _authService = AuthService();
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUserDetails();
-  }
-
-  Future<void> _loadUserDetails() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      email = prefs.getString('userEmail');
-    });
-  }
-
-  Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('isLoggedIn');
-    await prefs.remove('userEmail'); // Remove user details
-
+  void _logout() async {
+    await _authService.logout();
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
+      MaterialPageRoute(builder: (context) => LoginPage()),
     );
   }
 
@@ -82,16 +70,9 @@ class _DashboardState extends State<Dashboard> {
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            email != null
-                ? Text('Welcome, $email!')
-                : Text('Loading user details...'),
-            SizedBox(height: 20),
-            Text('This is your dashboard.'),
-            // Add more widgets as needed
-          ],
+        child: Text(
+          'Logged in as: ${widget.email}',
+          style: TextStyle(fontSize: 20),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
